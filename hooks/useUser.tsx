@@ -1,4 +1,4 @@
-import { Subcription, UserDetails } from '@/types';
+import { Subscription, UserDetails } from '@/types';
 import { User } from '@supabase/auth-helpers-nextjs';
 import {
   useSessionContext,
@@ -11,7 +11,7 @@ type UserContextType = {
   user: User | null;
   userDetails: UserDetails | null;
   isLoading: boolean;
-  subcription: Subcription | null;
+  subscription: Subscription | null;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(
@@ -33,31 +33,31 @@ export const MyUserContextProvider = (props: Props) => {
   const accessToken = session?.access_token ?? null;
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-  const [subcription, setSubcription] = useState<Subcription | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
 
   const getUserDetails = () => supabase.from('users').select('*').single();
-  const getSubcription = () =>
+  const getSubscription = () =>
     supabase
-      .from('subcriptions')
+      .from('subscriptions')
       .select('*, prices(*, products(*))')
       .in('status', ['trialing', 'active'])
       .single();
 
   useEffect(() => {
-    if (user && !isLoadingData && !userDetails && !subcription) {
+    if (user && !isLoadingData && !userDetails && !subscription) {
       setIsLoadingData: true;
 
-      Promise.allSettled([getUserDetails(), getSubcription()]).then(
+      Promise.allSettled([getUserDetails(), getSubscription()]).then(
         (result) => {
           const userDetailsPromise = result[0];
-          const subcriptionPromise = result[1];
+          const subscriptionPromise = result[1];
 
           if (userDetailsPromise.status === 'fulfilled') {
             setUserDetails(userDetailsPromise.value.data as UserDetails);
           }
 
-          if (subcriptionPromise.status === 'fulfilled') {
-            setSubcription(subcriptionPromise.value.data as Subcription);
+          if (subscriptionPromise.status === 'fulfilled') {
+            setSubscription(subscriptionPromise.value.data as Subscription);
           }
 
           setIsLoadingData(false);
@@ -65,7 +65,7 @@ export const MyUserContextProvider = (props: Props) => {
       );
     } else if (!user && !isLoadingUser && !isLoadingData) {
       setUserDetails(null);
-      setSubcription(null);
+      setSubscription(null);
     }
   }, [user, isLoadingUser]);
 
@@ -74,7 +74,7 @@ export const MyUserContextProvider = (props: Props) => {
     user,
     userDetails,
     isLoading: isLoadingUser || isLoadingData,
-    subcription,
+    subscription,
   };
 
   return <UserContext.Provider value={value} {...props} />;
