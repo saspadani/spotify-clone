@@ -21,8 +21,8 @@ export interface UserDetails {
 export interface Product {
   id: string;
   active?: boolean;
-  name: string;
-  description: string;
+  name?: string;
+  description?: string;
   image?: string;
   metadata?: Stripe.Metadata;
 }
@@ -42,7 +42,11 @@ export interface Price {
   product?: Product;
 }
 
-export interface Subcription {
+export interface ProductWithPrice extends Product {
+  prices?: Price[];
+}
+
+export interface Subscription {
   id: string;
   user_id: string;
   status?: Stripe.Subscription.Status;
